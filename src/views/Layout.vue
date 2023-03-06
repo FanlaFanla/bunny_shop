@@ -1,20 +1,28 @@
 <template>
   <!-- 顶部区域 -->
-  <nav>顶部区域</nav>
+  <AppNavbar></AppNavbar>
   <!-- 头部区域 -->
-  <header>头部区域</header>
+  <AppHeader></AppHeader>
   <!-- 内容容器 -->
   <div class="main">
     <!-- 二级路由 -->
     <router-view></router-view>
   </div>
   <!-- 底部组件 -->
-  <footer>footer</footer>
+  <AppFooter></AppFooter>
 </template>
 
 <script>
+import AppNavbar from '@/components/AppNavbar.vue'
+import AppHeader from '@/components/AppHeader.vue'
+import AppFooter from '@/components/AppFooter.vue'
 export default {
-  name: 'LayoutPage'
+  name: 'LayoutPage',
+  components: {
+    AppNavbar,
+    AppHeader,
+    AppFooter
+  }
 }
 </script>
 
