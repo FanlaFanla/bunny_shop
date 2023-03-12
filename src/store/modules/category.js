@@ -21,7 +21,6 @@ export default {
       const data = await getAllCategory()
       // 修改分类数据
       commit('setCategoryList', data.result)
-      console.log(data.result)
     }
   }
 }

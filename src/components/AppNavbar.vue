@@ -3,8 +3,8 @@
     <div class="container">
       <ul>
         <template v-if="profiles.token">
-          <li><a href="javascript:;" class="iconfont icon-user">{{profiles.account}}</a></li>
-          <li><a href="javascript:;">退出登录</a></li>
+          <li><a href="javascript:;" class="iconfont icon-user">{{profiles.nickname}}</a></li>
+          <li><a href="javascript:;" @click="logout">退出登录</a></li>
         </template>
         <template v-else>
           <li><RouterLink to="/login">登录</RouterLink></li>
@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import router from '@/router'
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 export default {
@@ -29,7 +30,13 @@ export default {
     const profiles = computed(() => {
       return store.state.user.profiles
     })
-    return { profiles }
+    // 退出登录
+    const logout = () => {
+      // 清空本地
+      store.commit('user/setUser', {})
+      router.push('/login')
+    }
+    return { profiles, logout }
   }
 }
 </script>

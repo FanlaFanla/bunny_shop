@@ -30,7 +30,8 @@
           <div>
             <em class="iconfont icon-code"></em>
             <Field type="text" name="code" v-model="form.code" placeholder="请输入验证码" autocomplete="off"/>
-            <span>发送验证码</span>
+            <span @click="sendmsg" v-if="time===60">发送验证码</span>
+            <span v-else-if="time<60">{{ time }}</span>
           </div>
         </template>
         <div class="clause" :validation-schema="userLoginSchema">
@@ -51,7 +52,11 @@ import { ref, reactive, watch, getCurrentInstance } from 'vue'
 import { Form, Field, ErrorMessage } from 'vee-validate'
 // 表单校验规则
 import veeValidate from '@/utils/vee-validate-schema'
-
+// 引用仓库
+import { useStore } from 'vuex'
+import { useRouter, useRoute } from 'vue-router'
+// 用户登录api
+import { userAccountLogin, userMobileLoginMsg, userMobileLogin } from '@/api/user'
 // import CustomMessage from '@/components/library/CustomMessage.js'
 export default {
   name: 'LoginForm',
@@ -89,8 +94,11 @@ export default {
       form.code = null
       // 如果没有销毁Field组件，之前的校验结果不会消耗
     })
+    const store = useStore()
+    const router = useRouter()
+    const route = useRoute()
     // 点击登录时对整体表单进行校验
-    // const { proxy } = getCurrentInstance()
+    const { proxy } = getCurrentInstance()
     const userRef = ref(null)
     async function submit () {
       // CustomMessage({})
@@ -98,9 +106,56 @@ export default {
       // validate对整体表单校验，返回的是promise
       const valid = await userRef.value.validate()
       // 表单验证成功为true
-      console.log(valid)
+      if (!valid.valid) {
+        let data = null
+        try {
+          // 判断是哪种登录方式
+          if (!isMessageLogin.value) {
+            // 1发送验证码，60秒倒计时
+            // 2手机号登录
+            const { mobile, code } = form
+            data = await userMobileLogin({ mobile, code })
+            console.log(data)
+          } else {
+            // 账号登录
+            const { account, password } = form
+            data = await userAccountLogin({ account, password })
+          }
+          // 存储用户信息
+          // 跳转来源地址
+          const { id, account, avatar, mobile, nickname, token } = data.result
+          store.commit('user/setUser', { id, account, avatar, mobile, nickname, token })
+          router.push(route.query.redirectUrl || '/')
+          // 消息提示
+          proxy.$CustomMessage({ type: 'success', text: '登录成功' })
+        } catch (e) {
+          console.log(e)
+        }
+      }
     }
-    return { form, isMessageLogin, userRef, submit, userLoginSchema }
+    // 验证码重置倒计时
+    const time = ref(60)
+    const sendmsg = async () => {
+      const valid = userLoginSchema.mobile(form.mobile)
+      let timer = null
+      if (valid) {
+        // 手机号校验成功
+        const result = await userMobileLoginMsg(form.mobile)
+        time.value--
+        // 开启60秒倒计时
+        console.log(result)
+        timer = setInterval(() => {
+          time.value--
+          if (time.value <= 0) {
+            clearInterval(timer)
+            time.value = 60
+          }
+        }, 1000)
+      } else {
+
+      }
+    }
+    return { form, isMessageLogin, userRef, submit, userLoginSchema, sendmsg, time }
   }
 }
 </script>

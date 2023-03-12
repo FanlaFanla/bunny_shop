@@ -2,7 +2,7 @@
   <header class="app-header">
     <div class="container">
       <div class="icon">
-        <a href="javascript:;"></a>
+        <RouterLink to="/"></RouterLink>
       </div>
       <!-- 组件 -->
       <AppHeaderNav></AppHeaderNav>
@@ -10,17 +10,16 @@
         <em class="iconfont icon-search"></em>
         <input type="text" placeholder="搜一搜">
       </div>
-      <div class="cart">
-        <em class="iconfont icon-cart"></em>
-        <span class="cartcount">1</span>
-      </div>
+      <!-- 使用购物车组件 -->
+      <AppHeaderCart></AppHeaderCart>
     </div>
   </header>
 </template>
 
 <script>
 import AppHeaderNav from './AppHeaderNav.vue'
-export default { components: { AppHeaderNav } }
+import AppHeaderCart from './AppHeaderCart.vue'
+export default { components: { AppHeaderNav, AppHeaderCart } }
 </script>
 
 <style scoped lang="less">
@@ -49,23 +48,6 @@ export default { components: { AppHeaderNav } }
         height: 32px;
         padding-left: 30px;
         border-bottom: 1px solid #ebe1e1;
-      }
-    }
-    .cart{
-      position: relative;
-      margin-left: 10px;
-      .iconfont{
-        font-size: 25px;
-      }
-      .cartcount{
-        position: absolute;
-        top: -5px;
-        left: 20px;
-        font-size: 12px;
-        padding: 2px 7px;
-        border-radius: 10px;
-        color: #fff;
-        background: rgb(251, 45, 45);
       }
     }
    }
